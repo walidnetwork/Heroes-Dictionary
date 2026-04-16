@@ -143,4 +143,25 @@ elif st.session_state.page == 'search':
                         <p style="color: #64748b; font-size: 0.8rem;">Page: {s['page']}</p>
                     </div>
                     """, unsafe_allow_html=True)
-                    st.
+                    st.write("🔊 استمع للجملة:")
+                    s_audio = speak(s['raw'])
+                    if s_audio: st.audio(s_audio)
+                st.markdown("<h3 class='section-header'>📖 صفحات الكتاب كاملة</h3>", unsafe_allow_html=True)
+                for p in pages:
+                    st.info(f"الصفحة رقم: {p['num']}")
+                    st.image(p['image'], use_container_width=True)
+            else: st.warning("لم نجد نتائج.")
+    if st.button("🔙 عودة"): st.session_state.page = 'home'; st.rerun()
+
+# --- 7. التذييل (Footer) ومعلومات المبدع ---
+st.markdown("<br><br>", unsafe_allow_html=True)
+f_c1, f_c2, f_c3 = st.columns([1, 2, 1])
+with f_c2:
+    st.markdown("<div style='text-align:center; border-top: 1px solid rgba(255,255,255,0.1); padding: 20px;'>", unsafe_allow_html=True)
+    p_img = get_base64('personal_photo.jpg')
+    if p_img: st.markdown(f'<img src="data:image/jpeg;base64,{p_img}" style="width:110px; border-radius:50%; border:3px solid #ef4444;">', unsafe_allow_html=True)
+    st.markdown("### Created by Mr. Walid")
+    st.markdown("<p class='bio-text'>مؤلف سلسلة كتب الأبطال ومدرس لغة إنجليزية متخصص في تأليف وتطوير المحتوى التعليمي.</p>", unsafe_allow_html=True)
+    st.markdown("<h4>سلسلة كتب الأبطال</h4>", unsafe_allow_html=True)
+    st.markdown("[![Facebook](https://img.shields.io/badge/Facebook-Follow%20Our%20Series-blue?style=for-the-badge&logo=facebook)](https://www.facebook.com/Alabtalbooks)") 
+    st.markdown("</div>", unsafe_allow_html=True)
