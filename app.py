@@ -6,8 +6,12 @@ from gtts import gTTS
 import io
 import re
 
-# --- 1. إعدادات الصفحة (يجب أن تكون في البداية) ---
-st.set_page_config(page_title="Alabtal AI Dictionary", layout="wide")
+# --- 1. إعدادات الصفحة والهوية ---
+st.set_page_config(
+    page_title="ALABTAL DICTIONARY",
+    page_icon="logo_animated.gif",
+    layout="wide"
+)
 
 # --- 2. دالة النطق ---
 def speak(text):
@@ -16,8 +20,7 @@ def speak(text):
         fp = io.BytesIO()
         tts.write_to_fp(fp)
         return fp.getvalue()
-    except:
-        return None
+    except: return None
 
 # --- 3. دالة جلب الصور ---
 def get_base64(bin_file):
@@ -29,143 +32,140 @@ def get_base64(bin_file):
         except: return ""
     return ""
 
-# --- 4. المحرك الذكي للبحث واستخلاص الجمل والصفحات ---
-def deep_search(pdf_path, word):
-    results = []
-    if not os.path.exists(pdf_path):
-        return None
+# --- 4. محرك البحث الذكي (استخراج جمل + صفحات كاملة) ---
+def advanced_search(pdf_path, word):
+    extracted_sentences = []
+    full_pages = []
+    
+    if not os.path.exists(pdf_path): return None, None
     
     try:
         doc = fitz.open(pdf_path)
         word_pattern = re.compile(re.escape(word), re.IGNORECASE)
         
+        found_pages_indices = []
+
         for page_num in range(len(doc)):
             page = doc[page_num]
             text = page.get_text("text")
             
-            # تقسيم النص إلى جمل
-            sentences = re.split(r'(?<=[.!?])\s+', text)
-            for sentence in sentences:
-                if word_pattern.search(sentence):
-                    clean_sentence = sentence.replace('\n', ' ').strip()
+            if word_pattern.search(text):
+                # 1. استخراج الجمل منفصلة
+                sentences = re.split(r'(?<=[.!?])\s+', text)
+                for sentence in sentences:
+                    if word_pattern.search(sentence):
+                        clean_s = sentence.replace('\n', ' ').strip()
+                        if clean_s not in [s['text'] for s in extracted_sentences]:
+                            extracted_sentences.append({"text": clean_s, "page": page_num + 1})
+
+                # 2. حفظ الصفحة كاملة كصورة
+                if page_num not in found_pages_indices:
+                    pix = page.get_pixmap(matrix=fitz.Matrix(2, 2)) # جودة عالية
+                    full_pages.append({"num": page_num + 1, "image": pix.tobytes("png")})
+                    found_pages_indices.append(page_num)
                     
-                    # الحصول على إحداثيات الكلمة لقص الصورة
-                    inst = page.search_for(word)
-                    img_data = None
-                    if inst:
-                        rect = inst[0]
-                        # قص منطقة عرضية كاملة لإظهار السياق
-                        clip = fitz.Rect(0, rect.y0 - 70, page.rect.width, rect.y1 + 120)
-                        pix = page.get_pixmap(clip=clip, matrix=fitz.Matrix(1.5, 1.5))
-                        img_data = pix.tobytes("png")
-                    
-                    results.append({
-                        "page": page_num + 1,
-                        "sentence": clean_sentence,
-                        "image": img_data
-                    })
-                    if len(results) >= 8: break
-            if len(results) >= 8: break
-        return results
-    except:
-        return []
+            if len(full_pages) >= 5: break # تحديد النتائج للسرعة
+            
+        return extracted_sentences, full_pages
+    except: return [], []
 
 # --- 5. تصميم الواجهة (CSS) ---
 st.markdown("""
     <style>
     .stApp { background: linear-gradient(to bottom, #1e3a8a, #0f172a); color: white; }
-    .result-card { 
-        background: rgba(255,255,255,0.1); 
-        padding: 15px; 
+    .sentence-card { 
+        background: white; 
+        color: #0f172a; 
+        padding: 20px; 
         border-radius: 15px; 
-        margin-bottom: 20px; 
-        border-right: 6px solid #ef4444;
+        margin-bottom: 10px; 
+        border-left: 8px solid #ef4444;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
     }
-    .sentence-text { font-size: 1.2rem; color: #fbbf24; font-weight: bold; }
-    .page-tag { background: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; }
-    .stTextInput input { background-color: white !important; color: black !important; font-weight: bold; }
-    .stButton>button { width: 100%; border-radius: 10px; background: #ef4444; color: white; font-weight: bold; height: 45px; border: none; }
+    .sentence-text { font-size: 1.4rem; font-weight: bold; margin-bottom: 5px; }
+    .page-info { color: #64748b; font-size: 0.9rem; }
+    .section-title { border-bottom: 2px solid #ef4444; padding-bottom: 10px; margin-top: 30px; margin-bottom: 20px; font-family: 'Cairo'; }
+    .stTextInput input { background-color: white !important; color: black !important; font-weight: bold; border-radius: 10px; }
+    .stButton>button { width: 100%; border-radius: 10px; background: #ef4444; color: white; font-weight: bold; height: 50px; border: none; }
     </style>
     """, unsafe_allow_html=True)
 
 # --- 6. نظام التنقل ---
 if 'page' not in st.session_state: st.session_state.page = 'home'
 
-# --- الصفحة الرئيسية (ترتيب إجباري) ---
+# --- الصفحة الرئيسية واختيار الترم (نفس الهيكل السابق المستقر) ---
 if st.session_state.page == 'home':
     logo = get_base64('logo_animated.gif')
-    if logo: st.markdown(f'<center><img src="data:image/gif;base64,{logo}" width="180"></center>', unsafe_allow_html=True)
+    if logo: st.markdown(f'<center><img src="data:image/gif;base64,{logo}" width="200"></center>', unsafe_allow_html=True)
     st.markdown("<h1 style='text-align: center; font-family: Cairo;'>قاموس الأبطال</h1>", unsafe_allow_html=True)
-    
-    # الصفوف 1-3
-    r1_c1, r1_c2, r1_c3 = st.columns(3)
-    grades1 = [("g1", "الصف الأول"), ("g2", "الصف الثاني"), ("g3", "الصف الثالث")]
-    for i, (gid, gname) in enumerate(grades1):
-        with [r1_c1, r1_c2, r1_c3][i]:
-            img = f"cover_{gid}.jpg"
-            if os.path.exists(img): st.image(img, use_container_width=True)
-            if st.button(f"دخول {gname}", key=gid):
-                st.session_state.grade_id, st.session_state.page = gid, 'select_term'; st.rerun()
+    for row in [["g1", "g2", "g3"], ["g4", "g5", "g6"]]:
+        cols = st.columns(3)
+        for i, gid in enumerate(row):
+            with cols[i]:
+                img = f"cover_{gid}.jpg"
+                if os.path.exists(img): st.image(img, use_container_width=True)
+                if st.button(f"دخول الصف {gid[1]}", key=gid):
+                    st.session_state.grade_id, st.session_state.page = gid, 'select_term'; st.rerun()
 
-    # الصفوف 4-6
-    r2_c1, r2_c2, r2_c3 = st.columns(3)
-    grades2 = [("g4", "الصف الرابع"), ("g5", "الصف الخامس"), ("g6", "الصف السادس")]
-    for i, (gid, gname) in enumerate(grades2):
-        with [r2_c1, r2_c2, r2_c3][i]:
-            img = f"cover_{gid}.jpg"
-            if os.path.exists(img): st.image(img, use_container_width=True)
-            if st.button(f"دخول {gname}", key=gid):
-                st.session_state.grade_id, st.session_state.page = gid, 'select_term'; st.rerun()
-
-# --- صفحة اختيار الترم ---
 elif st.session_state.page == 'select_term':
-    st.markdown("<h1 style='text-align:center;'>📚 اختر الترم الدراسي</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center; font-family: Cairo;'>📚 اختر الترم الدراسي</h1>", unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     gid = st.session_state.grade_id
-    with col1:
-        t1 = f"cover_{gid}_t1.jpg"
-        if os.path.exists(t1): st.image(t1, use_container_width=True)
-        if st.button("الترم الأول", key="t1_btn"):
-            st.session_state.term, st.session_state.page = "t1", "search"; st.rerun()
-    with col2:
-        t2 = f"cover_{gid}_t2.jpg"
-        if os.path.exists(t2): st.image(t2, use_container_width=True)
-        if st.button("الترم الثاني", key="t2_btn"):
-            st.session_state.term, st.session_state.page = "t2", "search"; st.rerun()
-    if st.button("🔙 العودة للرئيسية"): st.session_state.page = 'home'; st.rerun()
+    for i, t in enumerate(["t1", "t2"]):
+        with [col1, col2][i]:
+            img = f"cover_{gid}_{t}.jpg"
+            if os.path.exists(img): st.image(img, use_container_width=True)
+            if st.button(f"تصفح الترم {'الأول' if t=='t1' else 'الثاني'}", key=t):
+                st.session_state.term, st.session_state.page = t, 'search'; st.rerun()
+    if st.button("🔙 عودة"): st.session_state.page = 'home'; st.rerun()
 
-# --- صفحة البحث والنتائج ---
+# --- صفحة البحث والنتائج الجديدة ---
 elif st.session_state.page == 'search':
-    st.markdown(f"<h2 style='text-align:center;'>🔍 محرك بحث {st.session_state.grade_id.upper()}</h2>", unsafe_allow_html=True)
-    query = st.text_input("ادخل الكلمة الإنجليزية:")
+    st.markdown(f"<h2 style='text-align:center;'>🔍 محرك بحث الأبطال</h2>", unsafe_allow_html=True)
+    query = st.text_input("ادخل الكلمة (English):")
     
     if query:
+        # 1. نطق الكلمة الأساسية
+        st.markdown(f"### 🔊 نطق الكلمة: {query}")
+        q_audio = speak(query)
+        if q_audio: st.audio(q_audio)
+        
         pdf_file = f"{st.session_state.grade_id}_{st.session_state.term}.pdf"
-        with st.spinner('بطلنا يفتش في صفحات الكتاب...'):
-            data = deep_search(pdf_file, query)
+        with st.spinner('بطلنا يحلل كتاب المدرسة...'):
+            sentences, pages = advanced_search(pdf_file, query)
             
-            if data:
-                for item in data:
-                    with st.container():
-                        st.markdown(f"""
-                        <div class="result-card">
-                            <span class="page-tag">Page {item['page']}</span>
-                            <p class="sentence-text">{item['sentence']}</p>
-                        </div>
-                        """, unsafe_allow_html=True)
-                        
-                        # عرض الصورة والنطق
-                        c_img, c_audio = st.columns([2, 1])
-                        with c_img:
-                            if item['image']: st.image(item['image'])
-                        with c_audio:
-                            st.write("🔊 نطق الجملة:")
-                            audio = speak(item['sentence'])
-                            if audio: st.audio(audio, format='audio/mp3')
-                        st.write("---")
-            elif data is None:
-                st.error(f"ملف الكتاب {pdf_file} غير موجود.")
+            if sentences:
+                # 2. عرض الجمل المستخلصة
+                st.markdown("<h3 class='section-title'>📝 جمل من المنهج</h3>", unsafe_allow_html=True)
+                for s in sentences:
+                    st.markdown(f"""
+                    <div class="sentence-card">
+                        <p class="sentence-text">{s['text']}</p>
+                        <p class="page-info">ذكرت في صفحة: {s['page']}</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    st.write("🔊 استمع للجملة:")
+                    s_audio = speak(s['text'])
+                    if s_audio: st.audio(s_audio)
+                
+                # 3. عرض الصفحات كاملة
+                st.markdown("<h3 class='section-title'>📖 صفحات الكتاب كاملة</h3>", unsafe_allow_html=True)
+                for p in pages:
+                    st.markdown(f"**الصفحة رقم: {p['num']}**")
+                    st.image(p['image'], use_container_width=True)
+                    st.write("---")
             else:
-                st.warning("لم يتم العثور على الكلمة في هذا الكتاب.")
+                st.warning("لم نجد نتائج للكلمة المطلوبة.")
 
-    if st.button("🔙 تغيير الصف أو الترم"): st.session_state.page = 'home'; st.rerun()
+    if st.button("🔙 عودة للرئيسية"): st.session_state.page = 'home'; st.rerun()
+
+# --- التذييل (Footer) ---
+st.markdown("---")
+f_col1, f_col2, f_col3 = st.columns([1, 2, 1])
+with f_col2:
+    st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
+    p_img = get_base64('personal_photo.jpg')
+    if p_img: st.markdown(f'<img src="data:image/jpeg;base64,{p_img}" style="width:100px; border-radius:50%; border:3px solid #ef4444;">', unsafe_allow_html=True)
+    st.markdown("### Created by Mr. Walid")
+    st.markdown("[![Facebook](https://img.shields.io/badge/Facebook-Follow%20Us-blue?style=for-the-badge&logo=facebook)](https://www.facebook.com/your-page-link)")
+    st.markdown("</div>", unsafe_allow_html=True)
