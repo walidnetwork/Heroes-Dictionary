@@ -6,7 +6,7 @@ from gtts import gTTS
 import io
 import re
 
-# --- 1. إعدادات الصفحة ---
+# --- 1. إعدادات الصفحة والهوية ---
 st.set_page_config(
     page_title="ALABTAL DICTIONARY",
     page_icon="logo_animated.gif",
@@ -14,16 +14,18 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. دالة النطق ---
+# --- 2. دالة النطق الصافية (تتجاهل الرموز) ---
 def speak(text):
     try:
-        tts = gTTS(text=text, lang='en')
+        # حذف أي رموز غير أحرف أو أرقام لضمان نطق إنجليزي سليم
+        clean_text = re.sub(r'[^a-zA-Z0-9\s,.\'!?]', '', text)
+        tts = gTTS(text=clean_text, lang='en')
         fp = io.BytesIO()
         tts.write_to_fp(fp)
         return fp.getvalue()
     except: return None
 
-# --- 3. دالة جلب الصور ---
+# --- 3. دالة معالجة الصور ---
 def get_base64(bin_file):
     if os.path.exists(bin_file):
         try:
@@ -33,7 +35,7 @@ def get_base64(bin_file):
         except: return ""
     return ""
 
-# --- 4. محرك البحث ---
+# --- 4. المحرك الذكي المطور (تنظيف العرض والبحث) ---
 def advanced_search(pdf_path, word):
     extracted_sentences = []
     full_pages = []
@@ -48,11 +50,18 @@ def advanced_search(pdf_path, word):
             if word_pattern.search(text):
                 lines = text.split('\n')
                 for line in lines:
-                    clean_line = line.strip()
+                    # تنظيف السطر من الرموز الزخرفية (مثل المعين) قبل عرضه
+                    clean_line = re.sub(r'[^a-zA-Z0-9\s,.\'!?]', '', line).strip()
+                    
                     if word_pattern.search(clean_line) and len(clean_line) > len(word):
+                        # تمييز الكلمة باللون الأحمر
                         display_text = re.sub(word_pattern, f"<b style='color:#ef4444;'>{word}</b>", clean_line)
                         if clean_line not in [s['raw'] for s in extracted_sentences]:
-                            extracted_sentences.append({"display": display_text, "raw": clean_line, "page": page_num + 1})
+                            extracted_sentences.append({
+                                "display": display_text, 
+                                "raw": clean_line,
+                                "page": page_num + 1
+                            })
                 if page_num not in found_pages_indices:
                     pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
                     full_pages.append({"num": page_num + 1, "image": pix.tobytes("png")})
@@ -65,20 +74,27 @@ def advanced_search(pdf_path, word):
 st.markdown("""
     <style>
     .stApp { background: linear-gradient(to bottom, #1e3a8a, #0f172a); color: white; }
-    label { color: white !important; font-weight: bold !important; font-family: 'Cairo'; }
-    .stTextInput input { background-color: white !important; color: black !important; font-weight: bold; border-radius: 10px; }
-    .sentence-card { background: white; color: #0f172a; padding: 20px; border-radius: 15px; margin-bottom: 10px; border-right: 10px solid #ef4444; }
+    .main-title { text-align: center; font-family: 'Cairo'; font-size: 3rem; margin-bottom: 0; }
+    label { color: white !important; font-weight: bold !important; font-family: 'Cairo'; font-size: 1.2rem !important; }
+    .stTextInput input { background-color: white !important; color: black !important; font-weight: bold; border-radius: 12px; height: 50px; }
+    .sentence-card { 
+        background: white; color: #0f172a; padding: 25px; border-radius: 15px; 
+        margin-bottom: 10px; border-right: 10px solid #ef4444; box-shadow: 0px 6px 15px rgba(0,0,0,0.3);
+    }
     .stButton>button { width: 100%; border-radius: 12px; background: #ef4444; color: white; font-weight: bold; height: 50px; border: none; }
+    .section-header { border-bottom: 3px solid #ef4444; padding-bottom: 5px; margin-top: 40px; font-family: 'Cairo'; }
     </style>
     """, unsafe_allow_html=True)
 
+# --- 6. نظام التنقل ---
 if 'page' not in st.session_state: st.session_state.page = 'home'
 
 # --- الصفحة الرئيسية ---
 if st.session_state.page == 'home':
     logo_b64 = get_base64('logo_animated.gif')
     if logo_b64: st.markdown(f'<center><img src="data:image/gif;base64,{logo_b64}" width="220"></center>', unsafe_allow_html=True)
-    st.markdown("<h1 style='text-align:center; font-family:Cairo;'>قاموس الأبطال</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='main-title'>قاموس الأبطال</h1>", unsafe_allow_html=True)
+    
     for row_grades in [["g1", "g2", "g3"], ["g4", "g5", "g6"]]:
         cols = st.columns(3)
         for i, gid in enumerate(row_grades):
@@ -99,33 +115,48 @@ elif st.session_state.page == 'select_term':
             if os.path.exists(t_cover): st.image(t_cover, use_container_width=True)
             if st.button(f"تصفح الترم {'الأول' if t=='t1' else 'الثاني'}", key=f"btn_{t}"):
                 st.session_state.term, st.session_state.page = t, 'search'; st.rerun()
-    if st.button("🔙 العودة"): st.session_state.page = 'home'; st.rerun()
+    if st.button("🔙 عودة"): st.session_state.page = 'home'; st.rerun()
 
-# --- صفحة البحث والنتائج (التي كان بها الخطأ) ---
+# --- صفحة البحث والنتائج ---
 elif st.session_state.page == 'search':
     st.markdown("<h2 style='text-align:center; font-family: Cairo;'>🔍 محرك بحث الأبطال</h2>", unsafe_allow_html=True)
     query = st.text_input("ادخل الكلمة (English):")
+    
     if query:
         st.markdown(f"### 🔊 نطق الكلمة: {query}")
         q_audio = speak(query)
         if q_audio: st.audio(q_audio)
+        
         pdf_path = f"{st.session_state.grade_id}_{st.session_state.term}.pdf"
-        with st.spinner('بطلنا يبحث...'):
+        with st.spinner('بطلنا يفتش في صفحات الكتاب...'):
             sentences, pages = advanced_search(pdf_path, query)
             if sentences:
+                st.markdown("<h3 class='section-header'>📝 جمل من المنهج</h3>", unsafe_allow_html=True)
                 for s in sentences:
-                    st.markdown(f'<div class="sentence-card"><p style="font-size:1.4rem;">{s["display"]}</p><small>Page: {s["page"]}</small></div>', unsafe_allow_html=True)
+                    st.markdown(f"""
+                    <div class="sentence-card">
+                        <p style="font-size: 1.5rem; font-weight: bold;">{s['display']}</p>
+                        <p style="color: #64748b; font-size: 0.8rem;">Page: {s['page']}</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    st.write("🔊 استمع للجملة:")
                     s_audio = speak(s['raw'])
                     if s_audio: st.audio(s_audio)
+                
+                st.markdown("<h3 class='section-header'>📖 صفحات الكتاب كاملة</h3>", unsafe_allow_html=True)
                 for p in pages:
-                    st.image(p['image'], caption=f"Page {p['num']}", use_container_width=True)
+                    st.info(f"الصفحة رقم: {p['num']}")
+                    st.image(p['image'], use_container_width=True)
             else: st.warning("لم نجد نتائج.")
     if st.button("🔙 عودة"): st.session_state.page = 'home'; st.rerun()
 
-# --- Footer ---
-st.markdown("---")
+# --- التذييل (Footer) ---
+st.markdown("<br><br>", unsafe_allow_html=True)
 f_c1, f_c2, f_c3 = st.columns([1, 2, 1])
 with f_c2:
-    pers_img = get_base64('personal_photo.jpg')
-    if pers_img: st.markdown(f'<center><img src="data:image/jpeg;base64,{pers_img}" style="width:110px; border-radius:50%; border:3px solid #ef4444;"></center>', unsafe_allow_html=True)
-    st.markdown("<center><h3>Created by Mr. Walid</h3></center>", unsafe_allow_html=True)
+    st.markdown("<div style='text-align:center; border-top: 1px solid rgba(255,255,255,0.1); padding: 20px;'>", unsafe_allow_html=True)
+    p_img = get_base64('personal_photo.jpg')
+    if p_img: st.markdown(f'<img src="data:image/jpeg;base64,{p_img}" style="width:110px; border-radius:50%; border:3px solid #ef4444;">', unsafe_allow_html=True)
+    st.markdown("### Created by Mr. Walid")
+    st.markdown("[![Facebook](https://img.shields.io/badge/Facebook-Follow%20Us-blue?style=for-the-badge&logo=facebook)](https://www.facebook.com/your-page-link)")
+    st.markdown("</div>", unsafe_allow_html=True)
