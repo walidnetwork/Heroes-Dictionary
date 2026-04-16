@@ -18,7 +18,7 @@ def get_base64(bin_file):
     except Exception as e:
         return ""
 
-# --- 3. تحسين الواجهة بـ CSS لكسر البهتان وتنسيق الألوان ---
+# --- 3. تحسين الواجهة بـ CSS وتنسيق الألوان ---
 st.markdown("""
     <style>
     .stApp {
@@ -35,7 +35,6 @@ st.markdown("""
         height: 50px;
         font-size: 18px;
         transition: 0.3s ease;
-        margin-top: 10px;
     }
     .stButton>button:hover {
         transform: translateY(-5px);
@@ -53,45 +52,57 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# إدارة حالة التطبيق (Navigation System)
+# إدارة حالة التطبيق
 if 'stage' not in st.session_state:
     st.session_state.stage = 'splash'
 
-# --- المرحلة 1: شاشة الترحيب السينمائية (Splash Screen) ---
+# --- المرحلة 1: شاشة الترحيب الاحترافية (Splash Screen) ---
 if st.session_state.stage == 'splash':
     placeholder = st.empty()
     with placeholder.container():
-        # جلب الموارد
         logo_b64 = get_base64('logo_animated.gif')
         audio_b64 = get_base64('start_theme.wav')
         
         st.markdown(f"""
-            <div style="display: flex; justify-content: center; align-items: center; height: 80vh; flex-direction: column; text-align: center;">
+            <div id="splash-container" style="display: flex; justify-content: center; align-items: center; height: 80vh; flex-direction: column; text-align: center;">
                 <img src="data:image/gif;base64,{logo_b64}" width="320" style="margin-bottom: 30px;">
                 <audio autoplay>
                     <source src="data:audio/wav;base64,{audio_b64}" type="audio/wav">
                 </audio>
-                <h2 style="color: #f8fafc; animation: fadeIn 2.5s;">عالم الأبطال يرحب بك.. جاهز للتعلم؟</h2>
+                <h2 class="fade-text">عالم الأبطال يرحب بك.. جاهز للتعلم؟</h2>
             </div>
+            
             <style>
-                @keyframes fadeIn {{ from {{ opacity: 0; transform: translateY(20px); }} to {{ opacity: 1; transform: translateY(0); }} }}
+                @keyframes fadeInOut {{
+                    0% {{ opacity: 0; }}
+                    15% {{ opacity: 1; }}
+                    85% {{ opacity: 1; }}
+                    100% {{ opacity: 0; }}
+                }}
+                .fade-text {{
+                    animation: fadeInOut 7s forwards;
+                    color: #f8fafc;
+                    font-family: Cairo;
+                }
+                #splash-container {{
+                    animation: fadeInOut 7s forwards;
+                }
             </style>
         """, unsafe_allow_html=True)
         
-        # زيادة زمن الانتظار لـ 6 ثوانٍ لضمان استمتاع الطالب باللوجو والموسيقى
-        time.sleep(6) 
+        # وقت الانتظار البرمجي (7.5 ثانية لضمان اكتمال الأنيميشن)
+        time.sleep(7.5) 
         
     st.session_state.stage = 'select_grade'
     st.rerun()
 
-# --- المرحلة 2: واجهة اختيار الصف الدراسي (أغلفة الكتب) ---
+# --- المرحلة 2: واجهة اختيار الصف الدراسي ---
 elif st.session_state.stage == 'select_grade':
     st.markdown("<h1 style='margin-bottom: 30px;'>🦸‍♂️ اختر صفك الدراسي</h1>", unsafe_allow_html=True)
     
-    # توزيع الصفوف في شبكة احترافية
     col1, col2, col3 = st.columns(3)
     
-    # قائمة الصفوف والملفات (تأكد من مطابقة أسماء الملفات في GitHub)
+    # قائمة الصفوف والملفات
     grades = [
         ("Grade 1", "cover_g1.jpg"), ("Grade 2", "cover_g2.jpg"), ("Grade 3", "cover_g3.jpg"),
         ("Grade 4", "cover_g4.jpg"), ("Grade 5", "cover_g5.jpg"), ("Grade 6", "cover_g6.jpg")
@@ -101,17 +112,16 @@ elif st.session_state.stage == 'select_grade':
         with [col1, col2, col3][i % 3]:
             st.image(g_img, use_container_width=True)
             if st.button(f"{g_name}", key=f"btn_{g_name}"):
-                st.session_state.grade = g_name.replace(" ", "").upper() # تصبح G1, G2..
+                st.session_state.grade = g_name.replace(" ", "").upper()
                 st.session_state.stage = 'select_term'
                 st.rerun()
 
-# --- المرحلة 3: واجهة اختيار الترم (بصور الأغلفة) ---
+# --- المرحلة 3: واجهة اختيار الترم الدراسي ---
 elif st.session_state.stage == 'select_term':
-    st.markdown(f"<h1>📚 {st.session_state.grade} - اختر الترم الدراسي</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1>📚 {st.session_state.grade} - اختر الترم</h1>", unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
-    # الترم الأول
     with col1:
         img_t1 = f"cover_{st.session_state.grade.lower()}_t1.jpg"
         st.image(img_t1, caption="الترم الأول", use_container_width=True)
@@ -120,7 +130,6 @@ elif st.session_state.stage == 'select_term':
             st.session_state.stage = 'main_search'
             st.rerun()
             
-    # الترم الثاني
     with col2:
         img_t2 = f"cover_{st.session_state.grade.lower()}_t2.png"
         st.image(img_t2, caption="الترم الثاني", use_container_width=True)
@@ -129,9 +138,8 @@ elif st.session_state.stage == 'select_term':
             st.session_state.stage = 'main_search'
             st.rerun()
 
-# --- المرحلة 4: واجهة القاموس النهائية (البحث) ---
+# --- المرحلة 4: واجهة البحث النهائية ---
 elif st.session_state.stage == 'main_search':
-    # عرض غلاف الكتاب المختار بشكل صغير في الأعلى كأيقونة
     current_cover = f"cover_{st.session_state.grade.lower()}_t1.jpg" if st.session_state.term == "T1" else f"cover_{st.session_state.grade.lower()}_t2.png"
     
     st.markdown(f"""
@@ -143,12 +151,10 @@ elif st.session_state.stage == 'main_search':
     
     st.title("🔍 محرك بحث الأبطال")
     
-    # حقل البحث
-    query = st.text_input("ادخل الكلمة التي تريد البحث عنها (English):", placeholder="e.g. Hello")
+    query = st.text_input("ادخل الكلمة بالإنجليزية:", placeholder="e.g. Science")
     
     if query:
-        st.info(f"جاري البحث عن الكلمة في منهج {st.session_state.grade}...")
-        # (هنا سيتم إضافة كود البحث في الـ PDF لاحقاً)
+        st.info(f"جاري البحث عن '{query}'...")
 
     if st.button("🔙 العودة لاختيار الصفوف"):
         st.session_state.stage = 'select_grade'
