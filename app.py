@@ -173,9 +173,9 @@ with f_c2:
     st.markdown("<h4>سلسلة كتب الأبطال</h4>", unsafe_allow_html=True)
     st.markdown("[![Facebook](https://img.shields.io/badge/Facebook-Follow%20Our%20Series-blue?style=for-the-badge&logo=facebook)](https://www.facebook.com/Alabtalbooks)") 
     st.markdown("</div>", unsafe_allow_html=True)
-# --- زر التثبيت المطور (استجابة فورية) ---
+# --- زر التثبيت الحل النهائي (منع تحديد النص وتفعيل الضغط) ---
 st.markdown("""
-    <div id="custom-install-btn" style="
+    <div id="hero-btn" style="
         position: fixed;
         bottom: 30px;
         left: 20px;
@@ -192,20 +192,32 @@ st.markdown("""
         align-items: center;
         gap: 8px;
         border: 2px solid white;
-        touch-action: manipulation;
+        /* منع ظهور قائمة النسخ والمشاركة */
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
     ">
         📲 تثبيت القاموس على موبايلك
     </div>
 
     <script>
-    var btn = document.getElementById('custom-install-btn');
-    var action = function() {
+    var heroBtn = document.getElementById('hero-btn');
+    
+    function showAlert() {
         alert("يا بطل! لتثبيت القاموس:\\n1. اضغط على الثلاث نقاط (⋮) بالأعلى.\\n2. اختر 'تثبيت التطبيق' أو 'Add to Home Screen'.");
-    };
-    btn.addEventListener('click', action);
-    btn.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        action();
+    }
+
+    // التنفيذ عند اللمس المباشر (أسرع للموبايل)
+    heroBtn.addEventListener('touchstart', function(e) {
+        e.preventDefault(); // يمنع تحديد النص
+        showAlert();
+    }, {passive: false});
+
+    // التنفيذ عند الضغط بالماوس (للابتوب)
+    heroBtn.addEventListener('click', function() {
+        showAlert();
     });
     </script>
     """, unsafe_allow_html=True)
