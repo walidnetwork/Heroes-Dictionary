@@ -173,66 +173,28 @@ with f_c2:
     st.markdown("<h4>سلسلة كتب الأبطال</h4>", unsafe_allow_html=True)
     st.markdown("[![Facebook](https://img.shields.io/badge/Facebook-Follow%20Our%20Series-blue?style=for-the-badge&logo=facebook)](https://www.facebook.com/Alabtalbooks)") 
     st.markdown("</div>", unsafe_allow_html=True)
-# --- زر التثبيت المثالي (الأداء + الشياكة) ---
-st.markdown("""
-    <style>
-    .hero-final-btn {
-        position: fixed;
-        bottom: 30px;
-        left: 20px;
-        background: linear-gradient(135deg, #ef4444, #b91c1c);
-        color: white !important;
-        padding: 15px 25px;
-        border-radius: 50px;
-        font-weight: bold;
-        font-family: 'Cairo', sans-serif;
-        box-shadow: 0px 10px 25px rgba(0,0,0,0.5);
-        z-index: 9999999;
-        border: 2px solid white;
-        cursor: pointer;
-        outline: none;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        -webkit-user-select: none;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-    }
-    .hero-final-btn:active { transform: scale(0.95); }
-    </style>
+# --- الحل الجذري والمضمون (بدون جافا سكريبت) ---
+st.divider()
+st.markdown("### 📲 تثبيت قاموس الأبطال على موبايلك")
 
-    <button class="hero-final-btn" id="pwaInstallBtn">
-        📲 تثبيت تطبيق الأبطال
-    </button>
+# استخدام زر بايثون أصلي من Streamlit
+if st.button("🚀 اضغط هنا لبدء التثبيت الآن"):
+    # إظهار تعليمات واضحة داخل الصفحة لا يمكن حظرها
+    st.balloons() # احتفال بسيط للطالب
+    
+    with st.expander("✨ اضغط هنا لمشاهدة خطوات التثبيت (مهم جداً)", expanded=True):
+        st.success("يا بطل، لكي يظهر القاموس وسط ألعابك، اتبع هذه الخطوات البسيطة:")
+        
+        tab1, tab2 = st.tabs(["🌐 أندرويد (Chrome/Edge)", "🍎 آيفون (Safari)"])
+        
+        with tab1:
+            st.write("1️⃣ اضغط على **الثلاث نقاط (⋮)** في أعلى أو أسفل المتصفح.")
+            st.write("2️⃣ ابحث عن خيار **'تثبيت التطبيق'** أو **'إضافة إلى الهاتف'**.")
+            st.write("3️⃣ اضغط **إضافة (Add)**.. ومبروك عليك!")
+            
+        with tab2:
+            st.write("1️⃣ اضغط على زر **المشاركة (Share)** (المربع وسهم للأعلى).")
+            st.write("2️⃣ ابحث عن خيار **'إضافة للشاشة الرئيسية'** (Add to Home Screen).")
+            st.write("3️⃣ اضغط **إضافة**.. وستجد القاموس جاهزاً!")
 
-    <script>
-    let deferredPrompt;
-    const btn = document.getElementById('pwaInstallBtn');
-
-    // 1. الاستماع لطلب التثبيت من نظام التشغيل
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-    });
-
-    // 2. تنفيذ التثبيت عند الضغط
-    btn.addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                console.log('Hero student installed the app!');
-            }
-            deferredPrompt = null;
-        } else {
-            // حل احتياطي في حال عدم دعم المتصفح للتثبيت التلقائي
-            alert("يا بطل! لتثبيت القاموس:\\n1️⃣ اضغط على (⋮) بالأعلى.\\n2️⃣ اختر 'إضافة إلى الشاشة الرئيسية' (Add to Home Screen).");
-        }
-    });
-
-    // لضمان عمل اللمس على الموبايل بسرعة
-    btn.addEventListener('touchstart', function(e) {
-        // نترك المتصفح يتعامل مع الكليك الطبيعي هنا لمنع تداخل الأوامر
-    });
-    </script>
-""", unsafe_allow_html=True)
+    st.warning("⚠️ ملاحظة: إذا كنت تفتح الرابط من داخل (فيسبوك)، اضغط على (⋮) بالأعلى واختر 'فتح في المتصفح' أولاً.")
