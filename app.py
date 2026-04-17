@@ -6,22 +6,39 @@ import os
 import fitz  # PyMuPDF
 import re
 
-# --- 1. إعدادات الصفحة - سرعة فائقة وتصميم مسطح ---
+# --- 1. إعدادات الصفحة - سرعة فائقة وتصميم متمركز ---
 st.set_page_config(page_title="Heroes Dictionary", page_icon="🦸‍♂️", layout="wide")
 
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
     html, body, [data-testid="stappviewcontainer"] {
-        direction: rtl; text-align: right; font-family: 'Cairo', sans-serif;
+        direction: rtl; text-align: center; font-family: 'Cairo', sans-serif;
         background-color: #0f172a; color: white;
     }
-    /* تصميم أزرار الصفوف - واضحة وجذابة للأطفال */
-    .stButton>button {
-        width: 100%; border-radius: 10px; background-color: #ef4444;
-        color: white; font-weight: bold; font-size: 1.2rem; height: 3.5em; border: None;
-        margin-bottom: 5px;
+    
+    /* جعل حاوية الأزرار في المنتصف تماماً */
+    [data-testid="column"] {
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
+
+    /* تصميم أزرار الصفوف - أطول ومتمركزة */
+    .stButton>button {
+        width: 85% !important; /* جعل الزر أطول ليشغل مساحة أكبر */
+        margin: 0 auto;
+        display: block;
+        border-radius: 15px; 
+        background: linear-gradient(135deg, #ef4444, #b91c1c);
+        color: white; 
+        font-weight: bold; 
+        font-size: 1.2rem; 
+        height: 3.8em; 
+        border: None;
+        margin-bottom: 10px;
+    }
+    
     /* إصلاح اتجاه الجمل الإنجليزية */
     .sentence-box {
         background: #1e293b; padding: 15px; border-radius: 10px; margin-bottom: 8px;
@@ -81,7 +98,7 @@ def advanced_search(pdf_path, word):
 # --- 3. إدارة التنقل ---
 if 'step' not in st.session_state: st.session_state.step = 'select_grade'
 
-# --- 4. واجهة اختيار الصف (بدون صور لسرعة خارقة) ---
+# --- 4. واجهة اختيار الصف (متمركزة الآن) ---
 if st.session_state.step == 'select_grade':
     logo = get_base64('logo.png')
     if logo: st.markdown(f'<div style="text-align:center;"><img src="data:image/png;base64,{logo}" width="120"></div>', unsafe_allow_html=True)
@@ -89,17 +106,14 @@ if st.session_state.step == 'select_grade':
     st.markdown("<h3 style='text-align:center; color:#94a3b8;'>اختر صفك الدراسي يا بطل</h3>", unsafe_allow_html=True)
     st.write("<br>", unsafe_allow_html=True)
 
-    # عرض الصفوف كأزرار نصية منظمة جداً
-    c1, c2 = st.columns(2)
+    # عرض الصفوف في عمود واحد متمركز
     for i in range(1, 7):
-        target_col = c1 if i % 2 != 0 else c2
-        with target_col:
-            if st.button(f"🎓 الصف {i} الابتدائي", key=f"g_btn_{i}"):
-                st.session_state.grade = i
-                st.session_state.step = 'select_term'
-                st.rerun()
+        if st.button(f"🎓 الصف {i} الابتدائي", key=f"g_btn_{i}"):
+            st.session_state.grade = i
+            st.session_state.step = 'select_term'
+            st.rerun()
 
-# --- 5. واجهة اختيار الترم (هنا تظهر صور الأغلفة للتركيز) ---
+# --- 5. واجهة اختيار الترم ---
 elif st.session_state.step == 'select_term':
     g = st.session_state.grade
     st.markdown(f"<h3 style='text-align:center;'>الصف {g} الابتدائي</h3>", unsafe_allow_html=True)
