@@ -130,7 +130,7 @@ if 'step' not in st.session_state: st.session_state.step = 'select_grade'
 if st.session_state.step == 'select_grade':
     logo = get_base64('logo.png')
     if logo: st.markdown(f'<div style="text-align:center;"><img src="data:image/png;base64,{logo}" width="120"></div>', unsafe_allow_html=True)
-    st.markdown("<h2 style='text-align:center;'>🦸‍♂️ قاموس الأبطال</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align:center;'>🦸‍♂️ محرك بحث كتب الأبطال</h2>", unsafe_allow_html=True)
     st.markdown("<h3 style='text-align:center; color:#94a3b8;'>اختر صفك الدراسي يا بطل</h3>", unsafe_allow_html=True)
     st.write("<br>", unsafe_allow_html=True)
 
@@ -174,16 +174,4 @@ elif st.session_state.step == 'search':
                 if st.button(f"🔊 استمع", key=f"v_btn_{i}"): st.audio(speak_clean(s['raw']))
         if pages:
             for p in pages: st.image(p['image'], use_container_width=True)
-    if st.button("🔙 عودة"): st.session_state.step = 'select_term'; st.rerun()
-
-# --- 7. التذييل الجديد (Linktree) ---
-st.write("---")
-st.markdown(f"""
-    <div class="linktree-container">
-        <div class="linktree-text">تواصلوا معنا عبر جميع منصاتنا التعليمية</div>
-        <a href="https://linktr.ee/ALABTAL.books" target="_blank" class="linktree-btn">
-            🔗 جميع منصات الأبطال التعليمية
-        </a>
-        <div style="margin-top:15px; color:#64748b; font-size:0.8rem;">Created by Mr. Walid Elhagary</div>
-    </div>
-""", unsafe_allow_html=True)
+    if st.button("🔙 عودة"): st.session_state.step = 'select
