@@ -27,6 +27,7 @@ st.markdown("""
         border-right: 5px solid #ef4444; font-size: 1.4rem; color: #ffffff !important;
     }
     .word-highlight { color: #ff4b4b; font-weight: bold; }
+    .fb-link { color: #1877f2; text-decoration: none; font-weight: bold; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -75,9 +76,8 @@ def advanced_search(pdf_path, word):
 if 'step' not in st.session_state: 
     st.session_state.step = 'select_grade'
 
-# --- 4. واجهة اختيار الصف (مع إضافة اللوجو) ---
+# --- 4. واجهة اختيار الصف ---
 if st.session_state.step == 'select_grade':
-    # إظهار اللوجو في البداية
     logo = get_base64('logo_animated.gif') or get_base64('logo.png')
     if logo:
         st.markdown(f'<div style="text-align:center;"><img src="data:image/gif;base64,{logo}" width="180"></div>', unsafe_allow_html=True)
@@ -138,6 +138,13 @@ elif st.session_state.step == 'search':
             for p in pages: st.image(p['image'], use_container_width=True)
     if st.button("🔙 العودة"): st.session_state.step = 'select_term'; st.rerun()
 
-# --- 7. التذييل ---
+# --- 7. التذييل (Footer) مع رابط الفيسبوك ---
 st.write("---")
-st.markdown("<div style='text-align:center; color:#94a3b8; font-size:0.8rem;'>Created by Mr. Walid Elhagary</div>", unsafe_allow_html=True)
+st.markdown("""
+    <div style='text-align:center; color:#94a3b8; font-size:1rem;'>
+        Created by Mr. Walid Elhagary <br>
+        <a href='https://www.facebook.com/share/15fGv6mC8C/' target='_blank' class='fb-link'>
+            👍 تابعونا على فيسبوك: سلسلة كتب الأبطال
+        </a>
+    </div>
+""", unsafe_allow_html=True)
