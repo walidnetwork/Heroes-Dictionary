@@ -173,51 +173,46 @@ with f_c2:
     st.markdown("<h4>سلسلة كتب الأبطال</h4>", unsafe_allow_html=True)
     st.markdown("[![Facebook](https://img.shields.io/badge/Facebook-Follow%20Our%20Series-blue?style=for-the-badge&logo=facebook)](https://www.facebook.com/Alabtalbooks)") 
     st.markdown("</div>", unsafe_allow_html=True)
-# --- زر التثبيت الحل النهائي (منع تحديد النص وتفعيل الضغط) ---
+# --- الزر الأشيك بلمسة احترافية ---
 st.markdown("""
-    <div id="hero-btn" style="
+    <style>
+    .floating-btn {
         position: fixed;
         bottom: 30px;
         left: 20px;
-        background-color: #ef4444;
+        background: linear-gradient(135deg, #ef4444, #b91c1c);
         color: white !important;
-        padding: 14px 22px;
+        padding: 15px 25px;
         border-radius: 50px;
         font-weight: bold;
         font-family: 'Cairo', sans-serif;
-        box-shadow: 0px 10px 25px rgba(0,0,0,0.5);
-        cursor: pointer;
-        z-index: 2147483647 !important;
+        box-shadow: 0px 10px 20px rgba(0,0,0,0.4);
+        text-decoration: none !important;
+        z-index: 999999;
+        border: 2px solid rgba(255,255,255,0.3);
         display: flex;
         align-items: center;
-        gap: 8px;
-        border: 2px solid white;
-        /* منع ظهور قائمة النسخ والمشاركة */
+        gap: 10px;
+        cursor: pointer;
+        transition: transform 0.2s;
         -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
         user-select: none;
-        -webkit-tap-highlight-color: transparent;
-    ">
-        📲 تثبيت القاموس على موبايلك
-    </div>
+    }
+    .floating-btn:active { transform: scale(0.95); }
+    </style>
+
+    <a href="javascript:void(0)" class="floating-btn" id="installLink" onclick="showHeroAlert()">
+        📲 تثبيت تطبيق الأبطال
+    </a>
 
     <script>
-    var heroBtn = document.getElementById('hero-btn');
-    
-    function showAlert() {
-        alert("يا بطل! لتثبيت القاموس:\\n1. اضغط على الثلاث نقاط (⋮) بالأعلى.\\n2. اختر 'تثبيت التطبيق' أو 'Add to Home Screen'.");
+    function showHeroAlert() {
+        alert("يا بطل! لكي يظهر القاموس على شاشة موبايلك:\\n\\n1️⃣ اضغط على (⋮) بالأعلى (أو سهم المشاركة في الآيفون).\\n2️⃣ اختر 'Add to Home Screen' أو 'تثبيت التطبيق'.\\n\\nمبروك! ستجد القاموس الآن وسط ألعابك 🚀");
     }
-
-    // التنفيذ عند اللمس المباشر (أسرع للموبايل)
-    heroBtn.addEventListener('touchstart', function(e) {
-        e.preventDefault(); // يمنع تحديد النص
-        showAlert();
+    // لضمان الاستجابة السريعة جداً على الموبايل
+    document.getElementById('installLink').addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        showHeroAlert();
     }, {passive: false});
-
-    // التنفيذ عند الضغط بالماوس (للابتوب)
-    heroBtn.addEventListener('click', function() {
-        showAlert();
-    });
     </script>
-    """, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
