@@ -6,7 +6,7 @@ import os
 import fitz  # PyMuPDF
 import re
 
-# --- 1. إعدادات الصفحة - تصميم القائمة السريعة ---
+# --- 1. إعدادات الصفحة - إصلاح اتجاه النصوص الإنجليزية ---
 st.set_page_config(page_title="Heroes Dictionary", page_icon="🦸‍♂️", layout="wide")
 
 st.markdown("""
@@ -16,30 +16,19 @@ st.markdown("""
         direction: rtl; text-align: right; font-family: 'Cairo', sans-serif;
         background-color: #0f172a; color: white;
     }
-    /* تنسيق أزرار القائمة */
     .stButton>button {
         width: 100%; border-radius: 8px; background-color: #ef4444;
         color: white; font-weight: bold; font-size: 1.1rem; height: 3em; border: None;
-        text-align: center;
     }
-    /* إطار قائمة الصفوف */
-    .grade-item {
-        background-color: #1e293b;
-        padding: 10px;
-        border-radius: 12px;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        border: 1px solid #334155;
-    }
+    /* تعديل هام جداً: إجبار الجمل الإنجليزية على القراءة من اليسار لليمين */
     .sentence-box {
         background: #1e293b; padding: 15px; border-radius: 10px; margin-bottom: 8px;
         border-right: 5px solid #ef4444; font-size: 1.4rem; color: #ffffff !important;
+        direction: ltr !important; /* من اليسار لليمين */
+        text-align: left !important; /* محاذاة لليسار */
     }
     .word-highlight { color: #ff4b4b; font-weight: bold; }
     
-    /* زر الفيسبوك المزدوج */
     .fb-split-btn {
         display: inline-flex; align-items: center; text-decoration: none;
         border-radius: 5px; overflow: hidden; font-weight: bold; margin-top: 15px;
@@ -58,7 +47,6 @@ def get_base64(bin_file):
 
 @st.cache_data(show_spinner=False)
 def speak_clean(text):
-    # تنظيف النص من الرموز (مثل . أو ? أو رموز غريبة) للنطق النقي
     clean_text = re.sub(r'[^a-zA-Z0-9\s.,!?]', '', text)
     tts = gTTS(text=clean_text, lang='en')
     fp = io.BytesIO()
@@ -92,16 +80,14 @@ def advanced_search(pdf_path, word):
 # --- 3. إدارة التنقل ---
 if 'step' not in st.session_state: st.session_state.step = 'select_grade'
 
-# --- 4. واجهة قائمة الصفوف (تصميم القائمة الصغيرة السريع) ---
+# --- 4. واجهة قائمة الصفوف (القائمة السريعة) ---
 if st.session_state.step == 'select_grade':
     logo = get_base64('logo.png')
     if logo: st.markdown(f'<div style="text-align:center;"><img src="data:image/png;base64,{logo}" width="120"></div>', unsafe_allow_html=True)
-    st.markdown("<h2 style='text-align:center;'>🦸‍♂️ اختر صفك الدراسي</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align:right; text-align:center;'>🦸‍♂️ اختر صفك الدراسي</h2>", unsafe_allow_html=True)
     st.write("<br>", unsafe_allow_html=True)
 
-    # عرض الصفوف في قائمة عمودية منظمة
     for i in range(1, 7):
-        # حاوية الصف: صورة صغيرة + زر
         with st.container():
             c1, c2 = st.columns([0.5, 3])
             with c1:
@@ -110,9 +96,7 @@ if st.session_state.step == 'select_grade':
                     st.markdown(f'<img src="data:image/jpeg;base64,{img_b64}" style="width:60px; border-radius:8px;">', unsafe_allow_html=True)
             with c2:
                 if st.button(f"الصف {i} الابتدائي", key=f"g_list_{i}"):
-                    st.session_state.grade = i
-                    st.session_state.step = 'select_term'
-                    st.rerun()
+                    st.session_state.grade = i; st.session_state.step = 'select_term'; st.rerun()
 
 # --- 5. واجهة اختيار الترم ---
 elif st.session_state.step == 'select_term':
@@ -141,13 +125,14 @@ elif st.session_state.step == 'search':
         sentences, pages = advanced_search(pdf_file, word)
         if sentences:
             for i, s in enumerate(sentences[:10]):
-                st.markdown(f"<div class='sentence-box'>📄 {s['display']}</div>", unsafe_allow_html=True)
-                if st.button(f"🔊 استمع", key=f"v_btn_{i}"): st.audio(speak_clean(s['raw']))
+                # عرض الجملة (التي ستظهر الآن من اليسار لليمين بشكل صحيح)
+                st.markdown(f"<div class='sentence-box'>{s['display']}</div>", unsafe_allow_html=True)
+                if st.button(f"🔊 استمع للجملة {i+1}", key=f"v_btn_{i}"): st.audio(speak_clean(s['raw']))
         if pages:
             for p in pages: st.image(p['image'], use_container_width=True)
     if st.button("🔙 عودة"): st.session_state.step = 'select_term'; st.rerun()
 
-# --- 7. التذييل (Footer) ---
+# --- 7. التذييل ---
 st.write("---")
 st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
 st.markdown(f"""
