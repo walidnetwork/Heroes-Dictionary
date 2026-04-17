@@ -6,14 +6,13 @@ import os
 import fitz  # PyMuPDF
 import re
 
-# --- 1. إعدادات الصفحة - تركيز الأزرار في المنتصف ---
+# --- 1. إعدادات الصفحة والتصميم الفني ---
 st.set_page_config(page_title="Heroes Dictionary", page_icon="🦸‍♂️", layout="wide")
 
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
     
-    /* جعل الصفحة بالكامل تتمركز في المنتصف */
     html, body, [data-testid="stappviewcontainer"] {
         direction: rtl; 
         text-align: center; 
@@ -22,14 +21,13 @@ st.markdown("""
         color: white;
     }
 
-    /* إجبار أزرار Streamlit على التمركز في المنتصف */
     .stButton {
         display: flex;
         justify-content: center;
     }
 
     .stButton>button {
-        width: 80% !important; /* طول الزر */
+        width: 80% !important;
         max-width: 400px;
         border-radius: 15px; 
         background: linear-gradient(135deg, #ef4444, #b91c1c);
@@ -38,7 +36,7 @@ st.markdown("""
         font-size: 1.2rem; 
         height: 3.8em; 
         border: None;
-        margin: 5px auto; /* توسيط تلقائي */
+        margin: 5px auto;
     }
     
     .sentence-box {
@@ -47,13 +45,42 @@ st.markdown("""
         direction: ltr !important; text-align: left !important;
     }
     .word-highlight { color: #ff4b4b; font-weight: bold; }
-    
-    .fb-split-btn {
-        display: inline-flex; align-items: center; text-decoration: none;
-        border-radius: 5px; overflow: hidden; font-weight: bold; margin-top: 15px;
+
+    /* تصميم زر Linktree الجديد والشيك */
+    .linktree-container {
+        margin-top: 30px;
+        padding: 20px;
+        background: #1e293b;
+        border-radius: 20px;
+        border: 1px solid #334155;
+        display: inline-block;
+        width: 90%;
+        max-width: 500px;
     }
-    .fb-left { background-color: #4b4b4b; color: white; padding: 10px 15px; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
-    .fb-right { background-color: #0078d4; color: white; padding: 10px 20px; font-size: 1rem; }
+    .linktree-text {
+        color: #94a3b8;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+    .linktree-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: #39E09B; /* لون لينك تري المميز */
+        color: #1e293b !important;
+        text-decoration: none;
+        padding: 12px 25px;
+        border-radius: 50px;
+        font-weight: bold;
+        font-size: 1.1rem;
+        transition: transform 0.3s ease;
+        box-shadow: 0 4px 15px rgba(57, 224, 155, 0.3);
+    }
+    .linktree-btn:hover {
+        transform: scale(1.05);
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -99,7 +126,7 @@ def advanced_search(pdf_path, word):
 # --- 3. إدارة التنقل ---
 if 'step' not in st.session_state: st.session_state.step = 'select_grade'
 
-# --- 4. واجهة اختيار الصف (أسماء عربية + توسيط) ---
+# --- 4. واجهة اختيار الصف ---
 if st.session_state.step == 'select_grade':
     logo = get_base64('logo.png')
     if logo: st.markdown(f'<div style="text-align:center;"><img src="data:image/png;base64,{logo}" width="120"></div>', unsafe_allow_html=True)
@@ -107,10 +134,8 @@ if st.session_state.step == 'select_grade':
     st.markdown("<h3 style='text-align:center; color:#94a3b8;'>اختر صفك الدراسي يا بطل</h3>", unsafe_allow_html=True)
     st.write("<br>", unsafe_allow_html=True)
 
-    # قائمة الأسماء العربية للصفوف
     grade_names = ["الأول", "الثاني", "الثالث", "الرابع", "الخامس", "السادس"]
 
-    # عرض الصفوف بشكل متمركز تماماً
     for i, name in enumerate(grade_names, 1):
         if st.button(f"🎓 الصف {name} الابتدائي", key=f"g_btn_{i}"):
             st.session_state.grade = i
@@ -151,14 +176,14 @@ elif st.session_state.step == 'search':
             for p in pages: st.image(p['image'], use_container_width=True)
     if st.button("🔙 عودة"): st.session_state.step = 'select_term'; st.rerun()
 
-# --- 7. التذييل ---
+# --- 7. التذييل الجديد (Linktree) ---
 st.write("---")
-st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
 st.markdown(f"""
-    <div style='color:#94a3b8; font-size:0.8rem;'>Created by Mr. Walid Elhagary</div>
-    <a href="https://www.facebook.com/share/15fGv6mC8C/" target="_blank" class="fb-split-btn">
-        <div class="fb-left">FACEBOOK</div>
-        <div class="fb-right">FOLLOW OUR SERIES</div>
-    </a>
+    <div class="linktree-container">
+        <div class="linktree-text">تواصلوا معنا عبر جميع منصاتنا التعليمية</div>
+        <a href="https://linktr.ee/ALABTAL.books" target="_blank" class="linktree-btn">
+            🔗 جميع منصات الأبطال التعليمية
+        </a>
+        <div style="margin-top:15px; color:#64748b; font-size:0.8rem;">Created by Mr. Walid Elhagary</div>
+    </div>
 """, unsafe_allow_html=True)
-st.markdown("</div>", unsafe_allow_html=True)
