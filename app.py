@@ -160,42 +160,20 @@ elif st.session_state.page == 'search':
                     st.image(p['image'], use_container_width=True)
             else: st.warning("لم نجد نتائج.")
     if st.button("🔙 عودة"): st.session_state.page = 'home'; st.rerun()
-
 # --- 7. التذييل (Footer) ومعلومات المبدع ---
 st.markdown("<br><br>", unsafe_allow_html=True)
 f_c1, f_c2, f_c3 = st.columns([1, 2, 1])
+
 with f_c2:
-    st.markdown("<div style='text-align:center; border-top: 1px solid rgba(255,255,255,0.1); padding: 20px;'>", unsafe_allow_html=True)
     p_img = get_base64('personal_photo.jpg')
-    if p_img: st.markdown(f'<img src="data:image/jpeg;base64,{p_img}" style="width:110px; border-radius:50%; border:3px solid #ef4444;">', unsafe_allow_html=True)
+    if p_img:
+        st.markdown(f'<div style="text-align:center;"><img src="data:image/jpeg;base64,{p_img}" style="width:110px; border-radius:50%; border:3px solid #ef4444; box-shadow: 0px 4px 15px rgba(0,0,0,0.3);"></div>', unsafe_allow_html=True)
+    
+    st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
     st.markdown("### Created by Mr. Walid Elhagary")
-    st.markdown("<p class='bio-text'>مؤلف سلسلة كتب الأبطال ومتخصص في تأليف وتطوير المحتوى التعليمي.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #cbd5e1; font-size: 0.9rem;'>مؤلف سلسلة كتب الأبطال ومتخصص في تأليف وتطوير المحتوى التعليمي</p>", unsafe_allow_html=True)
     st.markdown("<h4>سلسلة كتب الأبطال</h4>", unsafe_allow_html=True)
-    st.markdown("[![Facebook](https://img.shields.io/badge/Facebook-Follow%20Our%20Series-blue?style=for-the-badge&logo=facebook)](https://www.facebook.com/Alabtalbooks)") 
+    st.markdown("[![Facebook](https://img.shields.io/badge/Facebook-Follow%20Our%20Series-blue?style=for-the-badge&logo=facebook)](https://www.facebook.com/share/15fGv6mC8C/)")
     st.markdown("</div>", unsafe_allow_html=True)
-# --- إغلاق التنسيقات السابقة (هام جداً) ---
-st.markdown("</div>", unsafe_allow_html=True)
 
-# --- زر التثبيت الاحترافي (الحل المعتمد) ---
-st.markdown("""
-    <style>
-    .hero-btn {
-        position: fixed; bottom: 30px; left: 20px;
-        background: linear-gradient(135deg, #ef4444, #b91c1c);
-        color: white !important; padding: 15px 25px;
-        border-radius: 50px; font-weight: bold; font-family: 'Cairo', sans-serif;
-        box-shadow: 0px 10px 20px rgba(0,0,0,0.4); z-index: 999999;
-        border: 2px solid white; cursor: pointer; outline: none;
-    }
-    </style>
-
-    <button class="hero-btn" onclick="showHeroAlert()">
-        📲 تثبيت تطبيق الأبطال
-    </button>
-
-    <script>
-    function showHeroAlert() {
-        alert("يا بطل! لكي يظهر القاموس وسط ألعابك:\\n\\n1️⃣ اضغط على الثلاث نقاط (⋮) بالأعلى.\\n2️⃣ اختر 'إضافة إلى الشاشة الرئيسية' (Add to Home Screen).\\n\\nمبروك! ستجد القاموس الآن على شاشتك 🚀");
-    }
-    </script>
-""", unsafe_allow_html=True)
+# --- نهاية الملف النظيف ---
