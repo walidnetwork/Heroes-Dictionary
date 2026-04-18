@@ -52,9 +52,7 @@ def advanced_search(pdf_path, word):
     except: pass
     return extracted_sentences, full_pages
 
-# --- 🪄 دالة الصوت السحري (رابط مباشر) ---
 def play_magic_sound():
-    # رابط صوت سحري مباشر ليعمل فوراً عند النقر
     magic_audio = '<iframe src="https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-61905/zapsplat_multimedia_notification_chime_bell_001_61908.mp3" allow="autoplay" style="display:none"></iframe>'
     st.markdown(magic_audio, unsafe_allow_html=True)
 
@@ -69,6 +67,13 @@ st.markdown(f"""
         background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
     }}
 
+    /* إجبار الأعمدة على البقاء بجانب بعضها 50% لكل جانب في الموبايل */
+    [data-testid="column"] {{
+        width: 48% !important;
+        flex: 1 1 48% !important;
+        min-width: 48% !important;
+    }}
+
     .main-title {{
         font-family: 'Cairo', sans-serif;
         font-size: clamp(1.5rem, 5vw, 3rem);
@@ -78,7 +83,6 @@ st.markdown(f"""
         margin-bottom: 10px;
     }}
 
-    /* تصميم أزرار Grade */
     .stButton>button {{
         width: 100% !important;
         background: rgba(0, 212, 255, 0.03) !important;
@@ -87,14 +91,8 @@ st.markdown(f"""
         border-radius: 10px !important;
         font-family: 'Orbitron', sans-serif !important;
         font-size: 0.8rem !important;
-        height: 45px !important;
-        margin-bottom: 5px !important;
-    }}
-
-    .stButton>button:hover {{
-        background: #00d4ff !important;
-        color: #000 !important;
-        box-shadow: 0 0 20px #00d4ff;
+        height: 50px !important;
+        margin-bottom: 10px !important;
     }}
 
     .center-logo-img {{
@@ -113,30 +111,38 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. واجهة الاختيار (اللوجو فوق والصفوف تحت جنباً إلى جنب) ---
+# --- 4. واجهة الاختيار (لوجو + 3 صفوف أفقية) ---
 if 'step' not in st.session_state: st.session_state.step = 'select_grade'
 
 if st.session_state.step == 'select_grade':
     st.markdown('<h1 class="main-title">محرك بحث الأبطال</h1>', unsafe_allow_html=True)
     
-    # اللوجو في الأعلى
     if logo_base64:
         st.markdown(f'<img src="data:image/png;base64,{logo_base64}" class="center-logo-img">', unsafe_allow_html=True)
 
-    # استخدام عمودين إجباريين لضمان البقاء بجانب بعضهما حتى في الموبايل
-    col_left, col_right = st.columns(2)
-    
-    with col_left:
+    # التوزيع الجديد: كل صف يحتوي على مرحلتين بجوار بعضهما
+    # الصف الأول
+    c1, c2 = st.columns(2)
+    with c1:
         if st.button("GRADE 1"): play_magic_sound(); st.session_state.grade = 1; st.session_state.step = 'select_term'; st.rerun()
+    with c2:
         if st.button("GRADE 2"): play_magic_sound(); st.session_state.grade = 2; st.session_state.step = 'select_term'; st.rerun()
+    
+    # الصف الثاني
+    c3, c4 = st.columns(2)
+    with c3:
         if st.button("GRADE 3"): play_magic_sound(); st.session_state.grade = 3; st.session_state.step = 'select_term'; st.rerun()
-
-    with col_right:
+    with c4:
         if st.button("GRADE 4"): play_magic_sound(); st.session_state.grade = 4; st.session_state.step = 'select_term'; st.rerun()
+
+    # الصف الثالث
+    c5, c6 = st.columns(2)
+    with c5:
         if st.button("GRADE 5"): play_magic_sound(); st.session_state.grade = 5; st.session_state.step = 'select_term'; st.rerun()
+    with c6:
         if st.button("GRADE 6"): play_magic_sound(); st.session_state.grade = 6; st.session_state.step = 'select_term'; st.rerun()
 
-# --- باقي الكود المستقر تماماً ---
+# --- باقي الكود المستقر ---
 elif st.session_state.step == 'select_term':
     g = st.session_state.grade
     st.markdown(f'<h2 style="text-align:center; color:#00d4ff;">Grade {g}</h2>', unsafe_allow_html=True)
@@ -167,9 +173,11 @@ elif st.session_state.step == 'search':
             for p in pages: st.image(p['image'], use_container_width=True)
     if st.button("🔙 BACK"): st.session_state.step = 'select_term'; st.rerun()
 
+# --- التذييل (Footer) مع استعادة الحقوق ---
 st.markdown("""
-    <div style="text-align:center; margin-top:30px;">
-        <a href="https://linktr.ee/ALABTAL.books" target="_blank" style="text-decoration:none; color:#00d4ff; border:1px solid #00d4ff; padding:5px 10px; border-radius:10px; font-size:0.7rem;">
+    <div style="text-align:center; margin-top:40px; padding-bottom: 20px;">
+        <p style="color:#64748b; font-size:0.8rem; margin-bottom:10px;">Created by Mr. Walid Elhagary</p>
+        <a href="https://linktr.ee/ALABTAL.books" target="_blank" style="text-decoration:none; color:#00d4ff; border:1px solid #00d4ff; padding:8px 20px; border-radius:15px; font-size:0.8rem;">
             🔗 منصات الأبطال التعليمية
         </a>
     </div>
