@@ -13,7 +13,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- 2. دوال البحث والنطق المستقرة ---
+# --- 2. دوال البحث والنطق (ثابتة تماماً) ---
 def get_base64(bin_file):
     if os.path.exists(bin_file):
         with open(bin_file, 'rb') as f:
@@ -52,7 +52,7 @@ def advanced_search(pdf_path, word):
     except: pass
     return extracted_sentences, full_pages
 
-# --- 3. تصميم CSS المضبط (بإضافة الحركة للوجو فقط) ---
+# --- 3. تصميم CSS المضبط للموبايل واللابتوب ---
 logo_base64 = get_base64('logo.png')
 
 st.markdown(f"""
@@ -63,78 +63,75 @@ st.markdown(f"""
         background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
     }}
 
+    /* إجبار الأعمدة على البقاء بجانب بعضها في الموبايل */
+    [data-testid="column"] {{
+        width: calc(33% - 1rem) !important;
+        flex: 1 1 calc(33% - 1rem) !important;
+        min-width: calc(33% - 1rem) !important;
+    }}
+
     .main-title {{
         font-family: 'Cairo', sans-serif;
-        font-size: 3rem;
+        font-size: clamp(1.5rem, 5vw, 3rem);
         color: #fff;
         text-shadow: 0 0 15px #00d4ff;
         text-align: center;
         margin-bottom: 20px;
     }}
 
-    /* تصميم الأزرار - ثابت تماماً */
     .stButton>button {{
-        width: 140px !important;
+        width: 100% !important;
+        max-width: 130px;
         background: rgba(0, 212, 255, 0.03) !important;
-        border: 2px solid #00d4ff !important;
+        border: 1.5px solid #00d4ff !important;
         color: #00d4ff !important;
-        border-radius: 10px !important;
+        border-radius: 8px !important;
         font-family: 'Orbitron', sans-serif !important;
-        font-size: 0.9rem !important;
-        height: 50px !important;
-        margin-bottom: 10px !important;
-        transition: 0.3s;
+        font-size: clamp(0.6rem, 2vw, 0.85rem) !important;
+        height: 45px !important;
+        margin-bottom: 8px !important;
     }}
 
-    .stButton>button:hover {{
-        background: #00d4ff !important;
-        color: #000 !important;
-        box-shadow: 0 0 20px #00d4ff;
-    }}
+    /* محاذاة الأزرار باتجاه اللوجو */
+    [data-testid="column"]:nth-child(1) {{ text-align: right !important; }}
+    [data-testid="column"]:nth-child(3) {{ text-align: left !important; }}
 
-    /* تقريب الأزرار من المركز - ثابت */
-    [data-testid="column"]:nth-child(2) {{ text-align: right !important; }}
-    [data-testid="column"]:nth-child(4) {{ text-align: left !important; }}
-
-    /* اللوجو مع تأثير النبض والإضاءة (التعديل الوحيد هنا) */
     .center-logo-img {{
         width: 100%;
-        max-width: 260px;
-        filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.4));
-        /* سطر التعديل لإضافة الحركة */
+        max-width: 220px;
         animation: pulseAndGlow 3s infinite ease-in-out;
     }}
 
-    /* تعريف حركة النبض والإضاءة */
     @keyframes pulseAndGlow {{
         0% {{ transform: scale(1); filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.4)); }}
-        50% {{ transform: scale(1.03); filter: drop-shadow(0 0 25px rgba(239, 68, 68, 0.7)); }}
+        50% {{ transform: scale(1.03); filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.7)); }}
         100% {{ transform: scale(1); filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.4)); }}
     }}
     
     .sentence-box {{
         background: rgba(30, 41, 59, 0.5);
         border-left: 5px solid #00d4ff;
-        padding: 15px;
+        padding: 10px;
         border-radius: 10px;
         margin: 10px 0;
         text-align: left;
         direction: ltr;
+        font-size: 0.9rem;
     }}
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. منطق التنقل والواجهة - ثابت تماماً ---
+# --- 4. واجهة الاختيار (تم استخدام 3 أعمدة فقط للموبايل) ---
 if 'step' not in st.session_state: st.session_state.step = 'select_grade'
 
 if st.session_state.step == 'select_grade':
     st.markdown('<h1 class="main-title">محرك بحث الأبطال</h1>', unsafe_allow_html=True)
     
-    # استخدام توزيع أعمدة ثابت تماماً
-    _, col_left, col_mid, col_right, _ = st.columns([0.5, 0.8, 1.2, 0.8, 0.5])
+    # 3 أعمدة فقط لضمان الثبات على الموبايل
+    col_left, col_mid, col_right = st.columns([1, 1.5, 1])
     
     with col_left:
-        st.write("<br><br>", unsafe_allow_html=True)
+        st.write("<br>", unsafe_allow_html=True)
         if st.button("GRADE 1"): st.session_state.grade = 1; st.session_state.step = 'select_term'; st.rerun()
         if st.button("GRADE 2"): st.session_state.grade = 2; st.session_state.step = 'select_term'; st.rerun()
         if st.button("GRADE 3"): st.session_state.grade = 3; st.session_state.step = 'select_term'; st.rerun()
@@ -144,11 +141,12 @@ if st.session_state.step == 'select_grade':
             st.markdown(f'<div style="text-align:center;"><img src="data:image/png;base64,{logo_base64}" class="center-logo-img"></div>', unsafe_allow_html=True)
 
     with col_right:
-        st.write("<br><br>", unsafe_allow_html=True)
+        st.write("<br>", unsafe_allow_html=True)
         if st.button("GRADE 4"): st.session_state.grade = 4; st.session_state.step = 'select_term'; st.rerun()
         if st.button("GRADE 5"): st.session_state.grade = 5; st.session_state.step = 'select_term'; st.rerun()
         if st.button("GRADE 6"): st.session_state.grade = 6; st.session_state.step = 'select_term'; st.rerun()
 
+# --- باقي الكود المستقر (اختيار الترم والبحث) ---
 elif st.session_state.step == 'select_term':
     g = st.session_state.grade
     st.markdown(f'<h2 style="text-align:center; color:#00d4ff;">Grade {g}</h2>', unsafe_allow_html=True)
@@ -167,7 +165,7 @@ elif st.session_state.step == 'search':
     g, t = st.session_state.grade, st.session_state.term
     pdf_file = f"g{g}_t{t}.pdf"
     st.markdown(f'<h3 style="text-align:center;">Grade {g} - Term {t}</h3>', unsafe_allow_html=True)
-    word = st.text_input("🔍 Search Word...", placeholder="Type here...").strip()
+    word = st.text_input("🔍 Search Word...", placeholder="Type...").strip()
     
     if word:
         st.audio(speak_clean(word))
@@ -178,15 +176,12 @@ elif st.session_state.step == 'search':
                 if st.button(f"🔊 Listen", key=f"v_{i}"): st.audio(speak_clean(s['raw']))
         if pages:
             for p in pages: st.image(p['image'], use_container_width=True)
-    
     if st.button("🔙 BACK"): st.session_state.step = 'select_term'; st.rerun()
 
-# --- 5. التذييل - ثابت تماماً ---
 st.markdown("""
-    <div style="text-align:center; margin-top:40px;">
-        <a href="https://linktr.ee/ALABTAL.books" target="_blank" style="text-decoration:none; color:#00d4ff; border:1px solid #00d4ff; padding:5px 15px; border-radius:15px; font-size:0.8rem;">
-            🔗 جميع منصات الأبطال التعليمية
+    <div style="text-align:center; margin-top:30px;">
+        <a href="https://linktr.ee/ALABTAL.books" target="_blank" style="text-decoration:none; color:#00d4ff; border:1px solid #00d4ff; padding:5px 10px; border-radius:10px; font-size:0.7rem;">
+            🔗 منصات الأبطال التعليمية
         </a>
-        <p style="color:#64748b; font-size:0.7rem; margin-top:10px;">Created by Mr. Walid Elhagary</p>
     </div>
 """, unsafe_allow_html=True)
