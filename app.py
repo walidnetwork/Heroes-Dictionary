@@ -52,7 +52,7 @@ def advanced_search(pdf_path, word):
     except: pass
     return extracted_sentences, full_pages
 
-# --- 3. تصميم CSS المضبط للتقريب والتوسيط ---
+# --- 3. تصميم CSS المضبط (بإضافة الحركة للوجو فقط) ---
 logo_base64 = get_base64('logo.png')
 
 st.markdown(f"""
@@ -72,7 +72,7 @@ st.markdown(f"""
         margin-bottom: 20px;
     }}
 
-    /* تصميم الأزرار - قمنا بتقليل العرض ليقترب من اللوجو */
+    /* تصميم الأزرار - ثابت تماماً */
     .stButton>button {{
         width: 140px !important;
         background: rgba(0, 212, 255, 0.03) !important;
@@ -92,14 +92,24 @@ st.markdown(f"""
         box-shadow: 0 0 20px #00d4ff;
     }}
 
-    /* تقريب الأزرار من المركز */
+    /* تقريب الأزرار من المركز - ثابت */
     [data-testid="column"]:nth-child(2) {{ text-align: right !important; }}
     [data-testid="column"]:nth-child(4) {{ text-align: left !important; }}
 
+    /* اللوجو مع تأثير النبض والإضاءة (التعديل الوحيد هنا) */
     .center-logo-img {{
         width: 100%;
         max-width: 260px;
         filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.4));
+        /* سطر التعديل لإضافة الحركة */
+        animation: pulseAndGlow 3s infinite ease-in-out;
+    }}
+
+    /* تعريف حركة النبض والإضاءة */
+    @keyframes pulseAndGlow {{
+        0% {{ transform: scale(1); filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.4)); }}
+        50% {{ transform: scale(1.03); filter: drop-shadow(0 0 25px rgba(239, 68, 68, 0.7)); }}
+        100% {{ transform: scale(1); filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.4)); }}
     }}
     
     .sentence-box {{
@@ -114,13 +124,13 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. منطق التنقل والواجهة ---
+# --- 4. منطق التنقل والواجهة - ثابت تماماً ---
 if 'step' not in st.session_state: st.session_state.step = 'select_grade'
 
 if st.session_state.step == 'select_grade':
     st.markdown('<h1 class="main-title">محرك بحث الأبطال</h1>', unsafe_allow_html=True)
     
-    # استخدام توزيع أعمدة يضغط العناصر للمركز
+    # استخدام توزيع أعمدة ثابت تماماً
     _, col_left, col_mid, col_right, _ = st.columns([0.5, 0.8, 1.2, 0.8, 0.5])
     
     with col_left:
@@ -171,7 +181,7 @@ elif st.session_state.step == 'search':
     
     if st.button("🔙 BACK"): st.session_state.step = 'select_term'; st.rerun()
 
-# --- 5. التذييل ---
+# --- 5. التذييل - ثابت تماماً ---
 st.markdown("""
     <div style="text-align:center; margin-top:40px;">
         <a href="https://linktr.ee/ALABTAL.books" target="_blank" style="text-decoration:none; color:#00d4ff; border:1px solid #00d4ff; padding:5px 15px; border-radius:15px; font-size:0.8rem;">
