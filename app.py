@@ -91,16 +91,10 @@ st.markdown(f"""
         text-align: center;
         margin-bottom: 5px;
     }}
-            .stMarkdown p, .stAlert p {{
+                .stMarkdown p, .stAlert p, div[data-testid="stMarkdownContainer"] p {{
         color: #FFFFFF !important;
         font-size: 1.1rem !important;
     }}
-    </style>
-""", unsafe_allow_html=True)
-
-
-st.markdown("""
-    <style>
     .stButton>button {{
         width: 100% !important;
         background: rgba(0, 212, 255, 0.05) !important;
@@ -111,22 +105,15 @@ st.markdown("""
         font-size: clamp(0.6rem, 2vw, 0.9rem) !important;
         height: 55px !important;
         margin-bottom: 10px !important;
-        box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        box-shadow: 0 0 15px #00d4ff !important;
         transition: 0.3s all ease-in-out;
-    }}
-
-    </style>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-    <style>
-    .stButton>button:hover {{
-
+        }}
+        .stButton>button:hover {{
         background: #00d4ff !important;
         color: #000 !important;
         box-shadow: 0 0 30px #00d4ff !important;
-        transform: scale(1.05);
-    }}
+        transform: scale(1.05)
+
 
     .center-logo-img {{
         width: 100%;
@@ -135,7 +122,9 @@ st.markdown("""
         margin: 0 auto 20px auto;
         display: block;
     }}
-
+}}
+    </style>
+""", unsafe_allow_html=True)
     @keyframes pulseAndGlow {{
         0% {{ transform: scale(1); filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.4)); }}
         50% {{ transform: scale(1.05); filter: drop-shadow(0 0 25px rgba(239, 68, 68, 0.8)); }}
