@@ -82,7 +82,12 @@ st.markdown(f"""
         text-align: center;
         margin-bottom: 5px;
     }}
-
+    .stMarkdown p, .stAlert p, div[data-testid="stMarkdownContainer"] p {{
+        color: #FFFFFF !important;
+        font-size: 1.1rem !important;
+        font-weight: 500 !important;
+    }}
+    
     /* إعادة تأثير النيون المضيء للأزرار */
     .stButton>button {{
         width: 100% !important;
