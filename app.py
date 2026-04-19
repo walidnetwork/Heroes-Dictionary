@@ -164,9 +164,8 @@ st.markdown(f"""
 if 'step' not in st.session_state: st.session_state.step = 'select_grade'
 
 if st.session_state.step == 'select_grade':
-    st.markdown(f'<h1 class="main-title"><span class="top-word">ALABTAL</span><span class="bottom-word">search engine</span></h1>', unsafe_allow_html=True)
+        st.markdown(f'<h1 class="main-title"><span class="top-word">ALABTAL</span><span class="bottom-word">search engine</span></h1>', unsafe_allow_html=True)
         
-        # اللوجو مع تقريب المسافة وإضافة الجملة تحته مباشرة
         if logo_base64:
             st.markdown(f'''
                 <div style="text-align: center; margin-top: -40px;">
