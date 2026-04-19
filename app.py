@@ -91,12 +91,15 @@ st.markdown(f"""
         text-align: center;
         margin-bottom: 5px;
     }}
-    .stMarkdown p, .stAlert p {
+        .stMarkdown p, .stAlert p {
         color: #FFFFFF !important;
         font-size: 1.1rem !important;
-}
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-
+st.markdown("""
+    <style>
     .stButton>button {{
         width: 100% !important;
         background: rgba(0, 212, 255, 0.05) !important;
@@ -110,6 +113,9 @@ st.markdown(f"""
         box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
         transition: 0.3s all ease-in-out;
     }}
+
+    </style>
+""", unsafe_allow_html=True)
 
     .stButton>button:hover {{
         background: #00d4ff !important;
