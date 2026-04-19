@@ -80,14 +80,18 @@ st.markdown(f"""
         min-width: 32% !important;
     }}
 
-    .main-title {{
+        .main-title {{
         font-family: 'Cairo', sans-serif;
         font-size: clamp(1.5rem, 5vw, 3rem);
-        color: #fff;
-        text-shadow: 0 0 15px #00d4ff;
+        color: #FFFFFF !important;
+        text-shadow: 
+            0 0 10px #00d4ff,
+            0 0 20px #00d4ff,
+            0 0 30px #00d4ff !important;
         text-align: center;
         margin-bottom: 5px;
     }}
+
 
     .stButton>button {{
         width: 100% !important;
