@@ -165,11 +165,15 @@ if 'step' not in st.session_state: st.session_state.step = 'select_grade'
 
 if st.session_state.step == 'select_grade':
     st.markdown(f'<h1 class="main-title"><span class="top-word">ALABTAL</span><span class="bottom-word">search engine</span></h1>', unsafe_allow_html=True)
-    
-    # 1. اللوجو فوق في المنتصف تماماً
-    if logo_base64:
-        st.markdown(f'<div class="logo-container"><img src="data:image/png;base64,{logo_base64}" class="center-logo-img"></div>', unsafe_allow_html=True)
-
+        
+        # اللوجو مع تقريب المسافة وإضافة الجملة تحته مباشرة
+        if logo_base64:
+            st.markdown(f'''
+                <div style="text-align: center; margin-top: -40px;">
+                    <img src="data:image/png;base64,{logo_base64}" style="width: 160px; margin-bottom: 10px;">
+                    <p style="color: white; font-family: Cairo; font-size: 1.3rem; font-weight: bold; margin-top: -10px;">اختر صفك الدراسى</p>
+                </div>
+            ''', unsafe_allow_html=True)
     # 2. الصفوف الستة تحت في عمودين (Grade 1-3 يمين، Grade 4-6 يسار)
     # نستخدم عمود فارغ صغير على الجانبين للمركزة
     _, col_grades_left, col_grades_right, _ = st.columns([0.2, 1, 1, 0.2], gap="medium")
